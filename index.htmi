@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Tabs</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 2rem;
+		}
+		.tab-list {
+			display: flex;
+			gap: 0.25rem;
+			border-bottom: 1px solid #ccc;
+		}
+		.tab {
+			padding: 0.6rem 1rem;
+			border: 1px solid transparent;
+			border-bottom: 0;
+			background: transparent;
+			cursor: pointer;
+			font: inherit;
+		}
+		.tab[aria-selected="true"] {
+			border-color: #ccc;
+			border-radius: 0.35rem 0.35rem 0 0;
+			background: #f5f5f5;
+			font-weight: bold;
+		}
+		.tab-panel {
+			padding: 1rem;
+			border: 1px solid #ccc;
+			border-top: 0;
+		}
+		.tab-panel[hidden] {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<h1>Tabs</h1>
+		<div class="tab-list" role="tablist" aria-label="Example sections">
+			<button class="tab" id="tab-overview" role="tab" aria-selected="true" aria-controls="panel-overview" tabindex="0">Overview</button>
+			<button class="tab" id="tab-details" role="tab" aria-selected="false" aria-controls="panel-details" tabindex="-1">Details</button>
+			<button class="tab" id="tab-resources" role="tab" aria-selected="false" aria-controls="panel-resources" tabindex="-1">Resources</button>
+		</div>
+		<section class="tab-panel" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
+			<h2>Overview</h2>
+			<p>Welcome. Select a tab to view its content.</p>
+		</section>
+		<section class="tab-panel" id="panel-details" role="tabpanel" aria-labelledby="tab-details" tabindex="0" hidden>
+			<h2>Details</h2>
+			<p>Additional information appears here.</p>
+		</section>
+		<section class="tab-panel" id="panel-resources" role="tabpanel" aria-labelledby="tab-resources" tabindex="0" hidden>
+			<h2>Resources</h2>
+			<p>Helpful resources appear here.</p>
+		</section>
+	</main>
+	<script>
+		const tabs = [...document.querySelectorAll('[role="tab"]')];
+		const panels = [...document.querySelectorAll('[role="tabpanel"]')];
+
+		function activateTab(tab) {
+			tabs.forEach((item) => {
+				const selected = item === tab;
+				item.setAttribute('aria-selected', selected);
+				item.tabIndex = selected ? 0 : -1;
+			});
+			panels.forEach((panel) => {
+				panel.hidden = panel.id !== tab.getAttribute('aria-controls');
+			});
+			tab.focus();
+		}
+
+		tabs.forEach((tab, index) => {
+			tab.addEventListener('click', () => activateTab(tab));
+			tab.addEventListener('keydown', (event) => {
+				let nextIndex;
+				if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+				if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+				if (event.key === 'Home') nextIndex = 0;
+				if (event.key === 'End') nextIndex = tabs.length - 1;
+				if (nextIndex !== undefined) {
+					event.preventDefault();
+					activateTab(tabs[nextIndex]);
+				}
+			});
+		});
+	</script>
+</body>
+</html>
